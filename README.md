@@ -1,4 +1,4 @@
-# sql-data-warehouse-project
+# Date warehouse 
 
 This project demonstrate a comprehensive data warehousing and Analytics Solution, from Building a data warehouse to generating actionable insights
 
