@@ -1,7 +1,9 @@
-Exec bronze.load_bronze;
+	Exec bronze.load_bronze
 
-	Create or alter procedure bronze.load_bronze as 
+    Create or alter procedure bronze.load_bronze as 
 	BEGIN
+
+	    DECLARE @start_time datetime , @end_time datetime , @start_batch datetime , @end_batch datetime ;
 		BEGIN  TRY
 
 			PRINT '======================================================================================';
@@ -11,11 +13,12 @@ Exec bronze.load_bronze;
 			PRINT '======================================================================================'
 			PRINT ' Loading CRM Table'
 			PRINT '======================================================================================'
-
+			set @start_time = GETDATE();
+			set @start_batch = GETDATE();
 			PRINT'>> Truncating Table: bronze.crm_cust_info';
 			Truncate Table bronze.crm_cust_info;
 
-			PRINT'>> INserting Data Into : bronze.crm_cust_info';
+			PRINT'>> Inserting Data Into : bronze.crm_cust_info';
 
 			bulk insert bronze.crm_cust_info
 			from 'C:\DataEngineer-Baraa\source_crm\cust_info.csv'
@@ -24,6 +27,9 @@ Exec bronze.load_bronze;
 					   Fieldterminator = ',',
 					   tablock
 				  );
+		    set @end_time = GETDATE();
+			PRINT'>> Load Duration :'  + CAST(DATEDIFF(SECOND , @start_time, @end_time) as NVARCHAR) + ' Seconds ';
+			set @start_time = GETdate();
 			PRINT'>> Truncating Table: bronze.crm_cust_info';
 
 			Truncate Table bronze.crm_prd_info;
@@ -35,6 +41,10 @@ Exec bronze.load_bronze;
 					   Fieldterminator = ',',
 					   tablock
 				  );
+			set @end_time = GETDATE();
+			PRINT'>> Load Duration :'  + CAST(DATEDIFF(SECOND , @start_time, @end_time) as NVARCHAR) + ' Seconds ';
+			PRINT'---------------------------------------------------------------------';
+			set @start_time = GETdate();
 			PRINT'>> Truncating Table: bronze.crm_sales_details';
 			Truncate Table bronze.crm_sales_details;
 			PRINT'>>INSERTING data into bronze.crm_sales_details';
@@ -44,7 +54,11 @@ Exec bronze.load_bronze;
 					   firstrow = 2,
 					   Fieldterminator = ',',
 					   tablock
-				 );
+					   );
+			set @end_time = getdate();
+			PRINT'>> Load Duration :'  + CAST(DATEDIFF(SECOND , @start_time, @end_time) as NVARCHAR) + ' Seconds ';
+			PRINT'---------------------------------------------------------------------';
+			set @start_time =getdate();	 
 			PRINT'>> Truncating Table: bronze.erp_cust_az12';
 
 			Truncate Table bronze.erp_cust_az12;
@@ -58,6 +72,10 @@ Exec bronze.load_bronze;
 					   Fieldterminator = ',',
 					   tablock
 				  );
+			set @end_time = getdate();
+			PRINT'>> Load Duration :'  + CAST(DATEDIFF(SECOND , @start_time, @end_time) as NVARCHAR) + ' Seconds ';
+			PRINT'---------------------------------------------------------------------';
+			set @start_time = getdate();
 			PRINT'>> Truncating Table: bronze.erp_loc_a101';
 			Truncate Table bronze.erp_loc_a101;
 			PRINT'>>INSERTING data bronze.erp_loc_a101';
@@ -68,7 +86,10 @@ Exec bronze.load_bronze;
 					   Fieldterminator = ',',
 					   tablock
 				 );
-
+			set @end_time = getdate();
+			PRINT'>> Load Duration :'  + CAST(DATEDIFF(SECOND , @start_time, @end_time) as NVARCHAR) + ' Seconds ';
+			PRINT'---------------------------------------------------------------------';
+			set @start_time = getdate();
 			PRINT'>> Truncating Table: bronze.erp_px_cat_g1v2';
 
 			Truncate table bronze.erp_px_cat_g1v2;
@@ -80,14 +101,21 @@ Exec bronze.load_bronze;
 					   firstrow = 2,
 					   Fieldterminator = ',',
 					   tablock
-				)	   
+				)
+			set @end_time = getdate();
+			set @end_batch = GETDATE();
+			PRINT'>> Load Duration :'  + CAST(DATEDIFF(SECOND , @start_time, @end_time) as NVARCHAR) + ' Seconds ';
+
+			PRINT'>> Load the whole ETL Duration :'  + CAST(DATEDIFF(SECOND , @start_batch, @end_batch) as NVARCHAR) + ' Seconds ';
+			PRINT'---------------------------------------------------------------------';
 			END TRY
+			
 		       BEGIN CATCH
 				   PRINT'===============================================================================';
 				   PRINT'ERROR OCCURED DURING LOADING BRONZE LAYER '
 				   PRINT 'ERROR Message ' + ERROR_MESSAGE();
 				   PRINT 'ERROR Message ' + CAST (ERROR_NUMBER() as NVARCHAR );
-				   PRINT 'ERROR Message ' + CAST (ERROR_NUMBER() as NVARCHAR );
+				   PRINT 'ERROR Message ' + CAST (ERROR_state() as NVARCHAR );
 
               END CATCH
   END
